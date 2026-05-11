@@ -1,0 +1,5 @@
+name: astrbot_plugin_try_chat
+author: developer
+description: 支持对特定私聊会话开启定时半小时检测，基于泊松分布概率唤醒AI。结合对应人格、聊天记录与当前时间，使用自定义提示词（支持{{current time}}变量）判断并决定是否主动发起聊天。未触发时自动增加下次触发概率。
+version: 1.0.0
+repo: https://github.com/developer/astrbot_plugin_try_chat

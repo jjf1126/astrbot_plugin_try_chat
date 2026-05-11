@@ -1,0 +1,67 @@
+{
+    "polling_interval": {
+        "type": "int",
+        "description": "轮询间隔时间（秒）",
+        "hint": "定时任务执行判定的时间间隔，默认为 1800 秒（半小时）。",
+        "default": 1800
+    },
+    "enabled_sessions": {
+        "description": "启用的会话列表",
+        "type": "list",
+        "hint": "填写需要开启自动聊天功能的会话标识（UMO），通常格式为：平台标识:消息类型:用户ID，例如：aiocqhttp:FriendMessage:123456",
+        "default": []
+    },
+    "decision_model_id": {
+        "description": "决策大模型",
+        "type": "string",
+        "hint": "用于执行“是否聊天”逻辑判断的大模型。留空则默认使用 AstrBot 全局默认模型。",
+        "default": "",
+        "_special": "select_provider"
+    },
+    "decision_prompt": {
+        "description": "决策提示词",
+        "type": "text",
+        "hint": "指导 AI 结合记录和时间判断是否发消息。必须包含判断标准，支持 {{current time}} 变量。",
+        "default": "你是一个贴心的朋友。请阅读以下最近的聊天记录，并结合当前时间 {{current time}}，判断现在是否适合主动找我聊天。如果在深夜且之前已经互道晚安，请回复 NO。如果距离上次聊天已经过了很久，且现在是白天，请回复 YES。只能回复 YES 或 NO。",
+        "obvious_hint": true,
+        "editor_mode": true,
+        "editor_language": "markdown",
+        "editor_theme": "vs-light"
+    },
+    "trigger_prompt": {
+        "description": "触发提示词",
+        "type": "text",
+        "hint": "当决策模型判定为 YES 时，模拟用户发送给机器人的消息内容，用于触发日常聊天模型生成最终的主动回复。",
+        "default": "现在请根据当前时间和我们的关系，主动向我发起一次聊天。"
+    },
+    "base_probability": {
+        "description": "基础触发概率",
+        "type": "float",
+        "hint": "定时轮询时的初始命中概率，取值范围 0~1。0.05 代表 5%。",
+        "default": 0.05
+    },
+    "probability_step": {
+        "description": "概率递增步长",
+        "type": "float",
+        "hint": "当本次轮询未命中或 AI 判定不发送时，下一次触发概率自动增加的数值。",
+        "default": 0.02
+    },
+    "history_len": {
+        "type": "int",
+        "description": "生成回复时使用的上下文长度",
+        "hint": "生成主动对话时，传递给模型的最近历史消息条数。默认为 10。",
+        "default": 10
+    },
+    "interval_fluctuation": {
+        "title": "间隔时间随机波动范围(秒)",
+        "description": "每次判断时，在基础轮询间隔上增加或减少的随机秒数，让触发时间更自然。例如设置300，则会在 基础间隔-300 到 基础间隔+300 之间随机。",
+        "type": "int",
+        "default": 0
+    },
+    "decision_memory_keyword": {
+        "default": "最近的约定",
+        "description": "判定时记忆搜索关键词",
+        "hint": "在判断是否适合聊天时，调用记忆插件使用的固定搜索关键词。",
+        "type": "string"
+    }
+}
