@@ -1,0 +1,1 @@
+# astrbot_plugin_try_chat
