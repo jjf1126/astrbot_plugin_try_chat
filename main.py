@@ -219,11 +219,23 @@ class TryChatPlugin(Star):
             else:
                 logger.info("TryChat: 判定阶段 - 未检测到 LivingMemory 插件，使用常规流程。")
                 
-            resp = await self.context.llm_generate(
-                chat_provider_id=decision_model_id,
-                prompt=decision_req.prompt,
-                system_prompt=decision_req.system_prompt
-            )
+            max_retries = getattr(self.config, "max_retries", 3)
+            retry_count = 0
+            resp = None
+            while retry_count < max_retries:
+                try:
+                    resp = await self.context.llm_generate(
+                        chat_provider_id=decision_model_id,
+                        prompt=decision_req.prompt,
+                        system_prompt=decision_req.system_prompt
+                    )
+                    break
+                except Exception as e:
+                    retry_count += 1
+                    logger.error(f"TryChat: 判定阶段大模型请求失败 (第 {retry_count}/{max_retries} 次重试): {e}")
+                    if retry_count >= max_retries:
+                        raise e
+                    await asyncio.sleep(2)
             if not resp or not resp.completion_text:
                 return False
                 
@@ -273,11 +285,22 @@ class TryChatPlugin(Star):
             else:
                 logger.info("TryChat: 未检测到 LivingMemory 插件，使用常规流程。")
 
-            chat_resp = await self.context.llm_generate(
-                chat_provider_id=provider_id,
-                prompt=req.prompt,
-                system_prompt=req.system_prompt
-            )
+            retry_count = 0
+            chat_resp = None
+            while retry_count < max_retries:
+                try:
+                    chat_resp = await self.context.llm_generate(
+                        chat_provider_id=provider_id,
+                        prompt=req.prompt,
+                        system_prompt=req.system_prompt
+                    )
+                    break
+                except Exception as e:
+                    retry_count += 1
+                    logger.error(f"TryChat: 触发阶段大模型请求失败 (第 {retry_count}/{max_retries} 次重试): {e}")
+                    if retry_count >= max_retries:
+                        raise e
+                    await asyncio.sleep(2)
             if not chat_resp or not chat_resp.completion_text:
                 return False
                 
