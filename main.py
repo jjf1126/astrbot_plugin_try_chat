@@ -209,15 +209,12 @@ class TryChatPlugin(Star):
                 system_prompt=""
             )
             
-            if has_living_memory:
-                logger.info(f"TryChat: 判定阶段 - 检测到 LivingMemory，使用关键词 '{decision_keyword}' 调用记忆...")
-                try:
-                    await call_event_hook(fake_event, EventType.OnLLMRequestEvent, decision_req)
-                    logger.info("TryChat: 判定阶段 - 记忆调用完成。")
-                except Exception as e:
-                    logger.error(f"TryChat: 判定阶段 OnLLMRequestEvent error: {e}")
-            else:
-                logger.info("TryChat: 判定阶段 - 未检测到 LivingMemory 插件，使用常规流程。")
+            logger.info(f"TryChat: 判定阶段 - 调用 OnLLMRequestEvent 钩子...")
+            try:
+                await call_event_hook(fake_event, EventType.OnLLMRequestEvent, decision_req)
+                logger.info("TryChat: 判定阶段 - 钩子调用完成。")
+            except Exception as e:
+                logger.error(f"TryChat: 判定阶段 OnLLMRequestEvent error: {e}")
                 
             max_retries = getattr(self.config, "max_retries", 3)
             retry_count = 0
@@ -275,15 +272,12 @@ class TryChatPlugin(Star):
                     has_living_memory = True
                     break
             
-            if has_living_memory:
-                logger.info("TryChat: 检测到 LivingMemory 插件，正在调用记忆内容...")
-                try:
-                    await call_event_hook(fake_event, EventType.OnLLMRequestEvent, req)
-                    logger.info("TryChat: 记忆内容调用完成。")
-                except Exception as e:
-                    logger.error(f"TryChat: OnLLMRequestEvent hook error: {e}")
-            else:
-                logger.info("TryChat: 未检测到 LivingMemory 插件，使用常规流程。")
+            logger.info("TryChat: 触发阶段 - 调用 OnLLMRequestEvent 钩子...")
+            try:
+                await call_event_hook(fake_event, EventType.OnLLMRequestEvent, req)
+                logger.info("TryChat: 触发阶段 - 钩子调用完成。")
+            except Exception as e:
+                logger.error(f"TryChat: OnLLMRequestEvent hook error: {e}")
 
             retry_count = 0
             chat_resp = None
